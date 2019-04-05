@@ -20,8 +20,8 @@ if (typeof Object.create !== 'function') {
             date_locale: 'en'
         };
         //---------------------------------------------------------------------------------
-        var options = $.extend(defaults, _options),
-            container = $(this),
+        var options = Object.assign(defaults, _options),
+            container = document.querySelector(_options.el),
             template,
             social_networks = ['facebook', 'instagram', 'vk', 'google', 'blogspot', 'twitter', 'pinterest', 'rss'],
             posts_to_load_count = 0,
@@ -85,7 +85,7 @@ if (typeof Object.create !== 'function') {
                 return '<a target="_blank" href="https://plus.google.com/s/' + string + '" >' + string + '<\/a>';
             },
             shorten: function(string) {
-                string = $.trim(string);
+                string = string.trim();
                 if (string.length > options.length) {
                     return jQuery.trim(string).substring(0, options.length).split(" ").slice(0, -1).join(" ") + "...";
                 } else {
@@ -117,53 +117,52 @@ if (typeof Object.create !== 'function') {
                 var rendered_html = Feed.template(this.content);
                 var data = this.content;
 
-                if ($(container).children('[social-feed-id=' + data.id + ']').length !== 0) {
+                if (container.querySelectorAll('[social-feed-id="' + data.id + '"]').length !== 0) {
                     return false;
                 }
-                if ($(container).children().length === 0) {
-                    $(container).append(rendered_html);
+                if (container.children.length === 0) {
+                    container.innerHTML += rendered_html;
                 } else {
                     var i = 0,
                         insert_index = -1;
-                    $.each($(container).children(), function() {
-                        if ($(this).attr('dt-create') < data.dt_create) {
+                    Array.prototype.forEach.call(container.children, function(el, i) {
+                        if (el.getAttribute('dt-create') < data.dt_create) {
                             insert_index = i;
                             return false;
                         }
-                        i++;
                     });
-                    $(container).append(rendered_html);
+                    container.innerHTML += rendered_html;
                     if (insert_index >= 0) {
                         insert_index++;
-                        var before = $(container).children('div:nth-child(' + insert_index + ')'),
-                            current = $(container).children('div:last-child');
-                        $(current).insertBefore(before);
+                        var before = container.querySelectorAll('div:nth-child(' + insert_index + ')'),
+                            current = container.querySelectorAll('div:last-child');
+                        current.insertBefore(before);
                     }
 
                 }
                 if (options.media_min_width) {
 
-                    var query = '[social-feed-id=' + data.id + '] img.attachment';
-                    var image = $(query);
+                    var image = document.querySelector('[social-feed-id="' + data.id + '"] img.attachment');
 
                     // preload the image
                     var height, width = '';
                     var img = new Image();
-                    var imgSrc = image.attr("src");
+                    var imgSrc = image.getAttribute("src");
 
-                    $(img).on('load',function() {
+                    img.addEventListener('load', function() {
                         if (img.width < options.media_min_width) {
                             image.hide();
                         }
                         // garbage collect img
                         delete img;
-                    }).on('error', function() {
+                    });
+
+                    img.addEventListener('error', function() {
                         // image couldnt be loaded
                         image.hide();
-
-                    }).attr({
-                        src: imgSrc
                     });
+
+                    img.setAttribute('src', imgSrc);
                 }
 
                 loaded_post_count++;
@@ -263,7 +262,7 @@ if (typeof Object.create !== 'function') {
                 utility: {
                     getPosts: function(json) {
                         if (json) {
-                            $.each(json, function() {
+                            Array.prototype.forEach.call(json, function() {
                                 var element = this;
                                 var post = new SocialFeedPost('twitter', Feed.twitter.utility.unifyPostData(element));
                                 post.render();
@@ -418,7 +417,7 @@ if (typeof Object.create !== 'function') {
                 utility: {
                     getPosts: function(json) {
                         if (json.items) {
-                            $.each(json.items, function(i) {
+                            Array.prototype.forEach.call(json.items, function() {
                                 var post = new SocialFeedPost('google', Feed.google.utility.unifyPostData(json.items[i]));
                                 post.render();
                             });
@@ -437,7 +436,7 @@ if (typeof Object.create !== 'function') {
 
                         if (options.show_media === true) {
                             if (element.object.attachments) {
-                                $.each(element.object.attachments, function() {
+                                Array.prototype.forEach.call(element.object.attachments, function() {
                                     var image = '';
                                     if (this.fullImage) {
                                         image = this.fullImage.url;
@@ -555,7 +554,7 @@ if (typeof Object.create !== 'function') {
                 utility: {
                     getPosts: function(json) {
                         if (json.response) {
-                            $.each(json.response, function() {
+                            Array.prototype.forEach.call(json.response, function(el, i) {
                                 if (this != parseInt(this) && this.post_type === 'post') {
                                     var owner_id = (this.owner_id) ? this.owner_id : this.from_id,
                                         vk_wall_owner_url = (owner_id > 0) ? (Feed.vk.user_json_template + owner_id + '&callback=?') : (Feed.vk.group_json_template + (-1) * owner_id + '&callback=?'),
@@ -634,7 +633,7 @@ if (typeof Object.create !== 'function') {
                 },
                 utility: {
                     getPosts: function(json) {
-                        $.each(json.feed.entry, function() {
+                        Array.prototype.forEach.call(json.feed.entry, function() {
                             var post = {},
                                 element = this;
                             post.id = element.id['$t'].replace(/[^a-z0-9]/gi, '');
@@ -727,8 +726,8 @@ if (typeof Object.create !== 'function') {
                     getPosts: function(json) {
                         console.log(json);
                         if (json.query.count > 0 ){
-                            $.each(json.query.results.feed, function(index, element) {
-                                var post = new SocialFeedPost('rss', Feed.rss.utility.unifyPostData(index, element));
+                            Array.prototype.forEach.call(json.query.results.feed, function(el, i) {
+                                var post = new SocialFeedPost('rss', Feed.rss.utility.unifyPostData(i, el));
                                 post.render();
                             });
                         }
@@ -780,4 +779,4 @@ if (typeof Object.create !== 'function') {
         })
     };
 
-})(jQuery);
+})(jQuery, window, document);
