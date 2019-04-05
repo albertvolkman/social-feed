@@ -485,23 +485,9 @@ if (typeof Object.create !== 'function') {
                         var authTokenParams = options.instagram.access_type + '=' + options.instagram[options.instagram.access_type];
                     }
 
-                    switch (account[0]) {
-                        case '@':
-                            var username = account.substr(1);
-                            url = Feed.instagram.api + 'users/search/?q=' + username + '&' + authTokenParams + '&count=1' + '&callback=?';
-                            Utility.request(url, Feed.instagram.utility.getUsers);
-                            break;
-                        case '#':
-                            var hashtag = account.substr(1);
-                            url = Feed.instagram.api + 'tags/' + hashtag + '/media/recent/?' + authTokenParams + '&' + 'count=' + options.instagram.limit + '&callback=?';
-                            Utility.request(url, Feed.instagram.utility.getImages);
-                            break;
-                        case '&':
-                            var id = account.substr(1);
-                            url = Feed.instagram.api + 'users/' + id + '/?' + authTokenParams + '&' + 'count=' + options.instagram.limit + '&callback=?';
-                            Utility.request(url, Feed.instagram.utility.getUsers);
-                        default:
-                    }
+                    var username = account.substr(1);
+                    url = Feed.instagram.api + 'users/search/?q=' + username + '&' + authTokenParams + '&count=1' + '&callback=?';
+                    Utility.request(url, Feed.instagram.utility.getUsers);
                 },
                 utility: {
                     getImages: function(json) {
@@ -520,7 +506,7 @@ if (typeof Object.create !== 'function') {
 
                         if (!jQuery.isArray(json.data)) json.data = [json.data]
                         json.data.forEach(function(user) {
-                            var url = Feed.instagram.api + 'users/' + user.id + '/media/recent/?' + authTokenParams + '&' + 'count=' + options.instagram.limit + '&callback=?';
+                            var url = Feed.instagram.api + 'users/self/media/recent/?' + authTokenParams + '&' + 'count=' + options.instagram.limit + '&callback=?';
                             Utility.request(url, Feed.instagram.utility.getImages);
                         });
                     },
