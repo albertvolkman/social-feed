@@ -12,7 +12,6 @@ Social networks supported:
 - [x] Facebook
 - [x] Instagram
 - [x] Twitter
-- [x] Google+
 - [x] VK
 - [x] Pinterest
 - [x] RSS
@@ -107,13 +106,6 @@ $('.social-feed-container').socialfeed({
         limit: 2,                                   //Integer: max number of posts to load
         source: 'all'                               //String: VK API post filter. Possible values: "Owner","Others","all","suggests"
     },
-
-    // GOOGLEPLUS
-    google:{
-         accounts: ['#teslamotors'],                //Array: Specify a list of accounts from which to pull posts
-         limit: 2,                                  //Integer: max number of posts to load
-         access_token: 'YOUR_GOOGLE_PLUS_ACCESS_TOKEN'//String: G+ access token
-     },
 
     // INSTAGRAM
     instagram:{

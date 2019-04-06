@@ -23,7 +23,7 @@ if (typeof Object.create !== 'function') {
         var options = Object.assign(defaults, _options),
             container = document.querySelector(_options.el),
             template,
-            social_networks = ['facebook', 'instagram', 'vk', 'google', 'blogspot', 'twitter', 'pinterest', 'rss'],
+            social_networks = ['facebook', 'instagram', 'vk', 'blogspot', 'twitter', 'pinterest', 'rss'],
             posts_to_load_count = 0,
             loaded_post_count = 0;
         // container.empty().css('display', 'block');
@@ -71,18 +71,10 @@ if (typeof Object.create !== 'function') {
             },
             wrapLinks: function(string, social_network) {
                 var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-                if (social_network === 'google-plus') {
-                    string = string.replace(/(@|#)([a-z0-9_]+['])/ig, Utility.wrapGoogleplusTagTemplate);
-                } else {
-                    string = string.replace(exp, Utility.wrapLinkTemplate);
-                }
-                return string;
+                return string.replace(exp, Utility.wrapLinkTemplate);
             },
             wrapLinkTemplate: function(string) {
                 return '<a target="_blank" href="' + string + '">' + string + '<\/a>';
-            },
-            wrapGoogleplusTagTemplate: function(string) {
-                return '<a target="_blank" href="https://plus.google.com/s/' + string + '" >' + string + '<\/a>';
             },
             shorten: function(string) {
                 string = string.trim();
@@ -390,72 +382,6 @@ if (typeof Object.create !== 'function') {
                                 }
                             }
                         }
-                        return post;
-                    }
-                }
-            },
-            google: {
-                posts: [],
-                loaded: false,
-                api: 'https://www.googleapis.com/plus/v1/',
-                getData: function(account) {
-                    var request_url;
-                    switch (account[0]) {
-                        case '#':
-                            var hashtag = account.substr(1);
-                            request_url = Feed.google.api + 'activities?query=' + hashtag + '&key=' + options.google.access_token + '&maxResults=' + options.google.limit;
-                            Utility.get_request(request_url, Feed.google.utility.getPosts);
-                            break;
-                        case '@':
-                            var username = account.substr(1);
-                            request_url = Feed.google.api + 'people/' + username + '/activities/public?key=' + options.google.access_token + '&maxResults=' + options.google.limit;
-                            Utility.get_request(request_url, Feed.google.utility.getPosts);
-                            break;
-                        default:
-                    }
-                },
-                utility: {
-                    getPosts: function(json) {
-                        if (json.items) {
-                            Array.prototype.forEach.call(json.items, function() {
-                                var post = new SocialFeedPost('google', Feed.google.utility.unifyPostData(json.items[i]));
-                                post.render();
-                            });
-                        }
-                    },
-                    unifyPostData: function(element) {
-                        var post = {};
-
-                        post.id = element.id;
-                        post.attachment = '';
-                        post.description = '';
-                        post.dt_create = moment(element.published);
-                        post.author_link = element.actor.url;
-                        post.author_picture = element.actor.image.url;
-                        post.author_name = element.actor.displayName;
-
-                        if (options.show_media === true) {
-                            if (element.object.attachments) {
-                                Array.prototype.forEach.call(element.object.attachments, function() {
-                                    var image = '';
-                                    if (this.fullImage) {
-                                        image = this.fullImage.url;
-                                    } else {
-                                        if (this.objectType === 'album') {
-                                            if (this.thumbnails && this.thumbnails.length > 0) {
-                                                if (this.thumbnails[0].image) {
-                                                    image = this.thumbnails[0].image.url;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    post.attachment = '<img class="attachment" src="' + image + '"/>';
-                                });
-                            }
-                        }
-                        post.message = element.title;
-                        post.link = element.url;
-
                         return post;
                     }
                 }
