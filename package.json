@@ -2,6 +2,7 @@
     "name": "social-feed",
     "version": "0.1.2",
     "description": "A javascript module that shows a user feed from the most popular social networks",
+    "main": "src/index.js",
     "dependencies": {
         "codebird": "~2.5.0",
         "moment": "~2.8.3"

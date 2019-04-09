@@ -660,14 +660,5 @@ export function socialfeed(_options) {
         }
     };
 
-    //make the plugin chainable
-    return this.each(function() {
-        // Initialization
-        Feed.init();
-        if (options.update_period) {
-            setInterval(function() {
-                return Feed.init();
-            }, options.update_period);
-        }
-    })
+    return Feed.init();
 }
