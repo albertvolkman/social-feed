@@ -23,7 +23,7 @@ export function socialfeed(_options) {
 
     //---------------------------------------------------------------------------------
     // This function performs consequent data loading from all of the sources by calling corresponding functions
-    function calculatePostsToLoadCount() {
+    (function() {
         social_networks.forEach(function(network) {
             if (options[network]) {
                 if (options[network].accounts) {
@@ -35,9 +35,7 @@ export function socialfeed(_options) {
                 }
             }
         });
-    }
-
-    calculatePostsToLoadCount();
+    }());
 
     var Utility = {
         wrapLinks: function(string, social_network) {
