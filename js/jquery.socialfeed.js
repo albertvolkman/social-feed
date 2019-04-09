@@ -14,7 +14,7 @@ export function socialfeed(_options) {
     };
     //---------------------------------------------------------------------------------
     var options = Object.assign(defaults, _options),
-        container = document.querySelector(_options.el),
+        container = [],
         template,
         social_networks = ['facebook', 'instagram', 'vk', 'blogspot', 'twitter', 'pinterest', 'rss'],
         posts_to_load_count = 0,
@@ -39,17 +39,6 @@ export function socialfeed(_options) {
     }
 
     calculatePostsToLoadCount();
-
-    function fireCallback() {
-        var fire = true;
-        /*$.each(Object.keys(loaded), function() {
-            if (loaded[this] > 0)
-                fire = false;
-        });*/
-        if (fire && options.callback) {
-            options.callback();
-        }
-    }
 
     var Utility = {
         wrapLinks: function(string, social_network) {
@@ -87,67 +76,6 @@ export function socialfeed(_options) {
 
         Feed[social_network].posts.push(this);
     }
-    SocialFeedPost.prototype = {
-        render: function() {
-            var rendered_html = Feed.template(this.content);
-            var data = this.content;
-
-            if (container.querySelectorAll('[social-feed-id="' + data.id + '"]').length !== 0) {
-                return false;
-            }
-            if (container.children.length === 0) {
-                container.innerHTML += rendered_html;
-            } else {
-                var i = 0,
-                    insert_index = -1;
-                Array.prototype.forEach.call(container.children, function(el, i) {
-                    if (el.getAttribute('dt-create') < data.dt_create) {
-                        insert_index = i;
-                        return false;
-                    }
-                });
-                container.innerHTML += rendered_html;
-                if (insert_index >= 0) {
-                    insert_index++;
-                    var before = container.querySelectorAll('div:nth-child(' + insert_index + ')'),
-                        current = container.querySelectorAll('div:last-child');
-                    current.insertBefore(before);
-                }
-
-            }
-            if (options.media_min_width) {
-
-                var image = document.querySelector('[social-feed-id="' + data.id + '"] img.attachment');
-
-                // preload the image
-                var height, width = '';
-                var img = new Image();
-                var imgSrc = image.getAttribute("src");
-
-                img.addEventListener('load', function() {
-                    if (img.width < options.media_min_width) {
-                        image.hide();
-                    }
-                    // garbage collect img
-                    delete img;
-                });
-
-                img.addEventListener('error', function() {
-                    // image couldnt be loaded
-                    image.hide();
-                });
-
-                img.setAttribute('src', imgSrc);
-            }
-
-            loaded_post_count++;
-            if (loaded_post_count == posts_to_load_count) {
-                fireCallback();
-            }
-
-        }
-
-    };
 
     var Feed = {
         template: false,
@@ -245,7 +173,7 @@ export function socialfeed(_options) {
                         Array.prototype.forEach.call(json, function() {
                             var element = this;
                             var post = new SocialFeedPost('twitter', Feed.twitter.utility.unifyPostData(element));
-                            post.render();
+                            container.push(Object.assign({}, post).content);
                         });
                     }
                 },
@@ -356,7 +284,7 @@ export function socialfeed(_options) {
                     if (json['data']) {
                         json['data'].forEach(function(element) {
                             var post = new SocialFeedPost('facebook', Feed.facebook.utility.unifyPostData(element));
-                            post.render();
+                            container.push(Object.assign({}, post).content);
                         });
                     }
                 },
@@ -417,7 +345,7 @@ export function socialfeed(_options) {
                     if (json.data) {
                         json.data.forEach(function(element) {
                             var post = new SocialFeedPost('instagram', Feed.instagram.utility.unifyPostData(element));
-                            post.render();
+                            container.push(Object.assign({}, post).content);
                         });
                     }
                 },
@@ -531,8 +459,8 @@ export function socialfeed(_options) {
                         fetch(vk_user_json)
                             .then(function(res) {
                                 res.json().then(function(data) {
-                                    var vk_post = new SocialFeedPost('vk', Feed.vk.utility.getUser(data, post, element, json));
-                                    vk_post.render();
+                                    var post = new SocialFeedPost('vk', Feed.vk.utility.getUser(data, post, element, json));
+                                    container.push(Object.assign({}, post).content);
                                 });
                             });
                     } else {
@@ -540,8 +468,8 @@ export function socialfeed(_options) {
                         fetch(vk_group_json)
                             .then(function(res) {
                                 res.json().then(function(data) {
-                                    var vk_post = new SocialFeedPost('vk', Feed.vk.utility.getGroup(data, post, element, json));
-                                    vk_post.render();
+                                    var post = new SocialFeedPost('vk', Feed.vk.utility.getGroup(data, post, element, json));
+                                    container.push(Object.assign({}, post).content);
                                 });
                             });
                     }
@@ -603,8 +531,7 @@ export function socialfeed(_options) {
                             }
                         }
 
-                        post.render();
-
+                        container.push(Object.assign({}, post).content);
                     });
                 }
             }
@@ -642,7 +569,7 @@ export function socialfeed(_options) {
                 getPosts: function(json) {
                     json.data.forEach(function(element) {
                         var post = new SocialFeedPost('pinterest', Feed.pinterest.utility.unifyPostData(element));
-                        post.render();
+                        container.push(Object.assign({}, post).content);
                     });
                 },
 
@@ -689,7 +616,7 @@ export function socialfeed(_options) {
                     if (json.query.count > 0 ){
                         Array.prototype.forEach.call(json.query.results.feed, function(el, i) {
                             var post = new SocialFeedPost('rss', Feed.rss.utility.unifyPostData(i, el));
-                            post.render();
+                            container.push(Object.assign({}, post).content);
                         });
                     }
                 },
