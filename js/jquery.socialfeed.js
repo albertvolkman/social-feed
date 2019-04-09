@@ -202,7 +202,7 @@ export function socialfeed(_options) {
                             if (element.entities.media && element.entities.media.length > 0) {
                                 var image_url = element.entities.media[0].media_url_https;
                                 if (image_url) {
-                                    post.attachment = '<img class="attachment" src="' + image_url + '" />';
+                                    post.attachment = image_url;
                                 }
                             }
                         }
@@ -274,7 +274,7 @@ export function socialfeed(_options) {
                     } else if (element.object_id) {
                         image_url = Feed.facebook.graph + element.object_id + '/picture/?type=normal';
                     }
-                    return '<img class="attachment" src="' + image_url + '" />';
+                    return image_url;
                 },
                 getExternalImageURL: function(image_url, parameter) {
                     image_url = decodeURIComponent(image_url).split(parameter + '=')[1];
@@ -383,7 +383,7 @@ export function socialfeed(_options) {
                     post.description = '';
                     post.link = element.link;
                     if (options.show_media) {
-                        post.attachment = '<img class="attachment" src="' + element.images.standard_resolution.url + '' + '" />';
+                        post.attachment = element.images.standard_resolution.url;
                     }
                     return post;
                 }
@@ -451,11 +451,11 @@ export function socialfeed(_options) {
                     if (options.show_media) {
                         if (element.attachment) {
                             if (element.attachment.type === 'link')
-                                post.attachment = '<img class="attachment" src="' + element.attachment.link.image_src + '" />';
+                                post.attachment = element.attachment.link.image_src;
                             if (element.attachment.type === 'video')
-                                post.attachment = '<img class="attachment" src="' + element.attachment.video.image_big + '" />';
+                                post.attachment = element.attachment.video.image_big;
                             if (element.attachment.type === 'photo')
-                                post.attachment = '<img class="attachment" src="' + element.attachment.photo.src_big + '" />';
+                                post.attachment = element.attachment.photo.src_big;
                         }
                     }
 
@@ -532,7 +532,7 @@ export function socialfeed(_options) {
 
                         if (options.show_media) {
                             if (element['media$thumbnail']) {
-                                post.attachment = '<img class="attachment" src="' + element['media$thumbnail']['url'] + '" />';
+                                post.attachment = element['media$thumbnail']['url'];
                             }
                         }
 
@@ -591,7 +591,7 @@ export function socialfeed(_options) {
                     post.social_network = 'pinterest';
                     post.link = element.link ? element.link : 'https://www.pinterest.com/pin/' + element.id;
                     if (options.show_media) {
-                        post.attachment = '<img class="attachment" src="' + element.image['original'].url + '" />';
+                        post.attachment = element.image['original'].url;
                     }
                     return post;
                 }
@@ -652,7 +652,7 @@ export function socialfeed(_options) {
                     post.social_network = 'rss';
                     post.link = item.link.href;
                     if (options.show_media && item.thumbnail !== undefined ) {
-                        post.attachment = '<img class="attachment" src="' + item.thumbnail.url + '" />';
+                        post.attachment = item.thumbnail.url;
                     }
                     return post;
                 }
