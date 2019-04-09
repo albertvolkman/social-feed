@@ -4,7 +4,6 @@
     "description": "A javascript module that shows a user feed from the most popular social networks",
     "dependencies": {
         "codebird": "~2.5.0",
-        "dot": "~1.0.1",
         "moment": "~2.8.3"
     }
 }

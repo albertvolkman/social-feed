@@ -1,5 +1,4 @@
-import { Codebird } from codebird;
-import { dot } from dot;
+import * as Codebird from 'codebird';
 import moment from 'moment';
 
 export function socialfeed(_options) {
@@ -80,38 +79,44 @@ export function socialfeed(_options) {
     var Feed = {
         template: false,
         init: function() {
-            Feed.getTemplate(function() {
-                social_networks.forEach(function(network) {
-                    if (options[network]) {
-                        if ( options[network].accounts ) {
-                            //loaded[network] = 0;
-                            options[network].accounts.forEach(function(account) {
-                                //loaded[network]++;
-                                Feed[network].getData(account);
-                            });
-                        } else if ( options[network].urls ) {
-                            options[network].urls.forEach(function(url) {
-                                Feed[network].getData(url);
-                            });
-                        } else {
-                            Feed[network].getData();
-                        }
-                    }
+            return new Promise(function(resolve, reject) {
+                Feed.getTemplate(function() {
+                    social_networks.map(function(network) {
+                        Feed.processAll(network, resolve);
+                    });
                 });
             });
+        },
+        processAll: function(network, cb) {
+            if (options[network]) {
+                if ( options[network].accounts ) {
+                    //loaded[network] = 0;
+                    options[network].accounts.forEach(function(account) {
+                        //loaded[network]++;
+                        Feed[network].getData(account);
+                    });
+                } else if ( options[network].urls ) {
+                    options[network].urls.forEach(function(url) {
+                        Feed[network].getData(url);
+                    });
+                } else {
+                    Feed[network].getData();
+                }
+            }
+            cb(container);
         },
         getTemplate: function(callback) {
             if (Feed.template)
                 return callback();
             else {
                 if (options.template_html) {
-                    Feed.template = dot.template(options.template_html);
+                    Feed.template = options.template_html;
                     return callback();
                 } else {
                     fetch(options.template)
                         .then(function(template) {
                             template.text().then(function(data) {
-                                Feed.template = dot.template(data);
+                                Feed.template = data;
                                 return callback();
                             })
                         })
