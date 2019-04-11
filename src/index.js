@@ -131,14 +131,14 @@ export function socialfeed(_options) {
           //loaded[network] = 0;
           options[network].accounts.forEach(function(account) {
             //loaded[network]++;
-            Feed[network].getData(account);
+            return Feed[network].getData(account);
           });
         } else if (options[network].urls) {
           options[network].urls.forEach(function(url) {
-            Feed[network].getData(url);
+            return Feed[network].getData(url);
           });
         } else {
-          Feed[network].getData();
+          return Feed[network].getData();
         }
       }
     },
@@ -161,7 +161,7 @@ export function socialfeed(_options) {
         switch (account[0]) {
           case "@":
             var userid = account.substr(1);
-            Codebird.__call(
+            return Codebird.__call(
               "statuses_userTimeline",
               {
                 id: userid,
@@ -177,7 +177,7 @@ export function socialfeed(_options) {
             break;
           case "#":
             var hashtag = account.substr(1);
-            Codebird.__call(
+            return Codebird.__call(
               "search_tweets",
               {
                 q: hashtag,
@@ -273,7 +273,7 @@ export function socialfeed(_options) {
                   fields +
                   limit +
                   query_extention;
-                proceed(request_url);
+                return proceed(request_url);
               }
             });
             break;
@@ -287,10 +287,11 @@ export function socialfeed(_options) {
               fields +
               limit +
               query_extention;
-            proceed(request_url);
+
+            return proceed(request_url);
             break;
           default:
-            proceed(request_url);
+            return proceed(request_url);
         }
       },
       utility: {
@@ -410,7 +411,7 @@ export function socialfeed(_options) {
             options.instagram[options.instagram.access_type];
         }
 
-        Feed.instagram.utility.getUsers();
+        return Feed.instagram.utility.getUsers();
       },
       utility: {
         getImages: function(json) {
@@ -441,7 +442,7 @@ export function socialfeed(_options) {
               options.instagram.limit +
               "&callback=?";
 
-            fetch(url)
+            return fetch(url)
               .then(res => res.json())
               .then(data => Feed.instagram.utility.getImages(data))
               .catch(function(error) {
@@ -496,7 +497,7 @@ export function socialfeed(_options) {
               options.vk.limit +
               "&callback=?";
 
-            fetch(request_url)
+            return fetch(request_url)
               .then(res => res.json())
               .then(data => Feed.vk.utility.getPosts(data));
             break;
@@ -510,7 +511,7 @@ export function socialfeed(_options) {
               options.vk.limit +
               "&callback=?";
 
-            fetch(request_url)
+            return fetch(request_url)
               .then(res => res.json())
               .then(data => Feed.vk.utility.getPosts(data));
             break;
@@ -531,7 +532,7 @@ export function socialfeed(_options) {
                         "&callback=?",
                   element = this;
 
-                fetch(vk_wall_owner_url)
+                return fetch(vk_wall_owner_url)
                   .then(res => res.text())
                   .then(data => Feed.vk.utility.unifyPostData(data, element, json));
               }
@@ -616,7 +617,7 @@ export function socialfeed(_options) {
               username +
               ".blogspot.com/feeds/posts/default?alt=json-in-script&callback=?";
 
-            fetch(url)
+            return fetch(url)
               .then(res => res.json())
               .then(data => getPosts(data));
             break;
@@ -681,7 +682,8 @@ export function socialfeed(_options) {
             break;
           default:
         }
-        fetch(request_url)
+
+        return fetch(request_url)
           .then(res => res.json())
           .then(data => Feed.pinterest.utility.getPosts(data));
       },
@@ -734,7 +736,7 @@ export function socialfeed(_options) {
           ),
           request_url = Feed.rss.api + yql + "&format=json&callback=?";
 
-        fetch(request_url)
+        return fetch(request_url)
           .then(data => data.json())
           .then(data => Feed.rss.utility.getPosts(data));
       },
