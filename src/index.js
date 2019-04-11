@@ -138,11 +138,10 @@ export function socialfeed(_options) {
           return callback();
         } else {
           fetch(options.template)
-            .then(function(template) {
-              template.text().then(function(data) {
-                Feed.template = data;
-                return callback();
-              });
+            .then(data => data.text())
+            .then(template => {
+              Feed.template = template;
+              return callback();
             })
             .catch(function(error) {
               console.log(error);
@@ -255,11 +254,11 @@ export function socialfeed(_options) {
       loaded: false,
       getData: function(account) {
         var proceed = function(request_url) {
-          fetch(request_url).then(function(res) {
-            res.text().then(function(data) {
+          fetch(request_url)
+            .then(res => res.text())
+            .then(data => {
               Feed.facebook.utility.getPosts(data);
             });
-          });
         };
         var fields =
           "?fields=id,from,name,message,created_time,story,description,link";
@@ -450,11 +449,8 @@ export function socialfeed(_options) {
               "&callback=?";
 
             fetch(url)
-              .then(function(data) {
-                data.json().then(function(data) {
-                  Feed.instagram.utility.getImages(data);
-                });
-              })
+              .then(res => res.json())
+              .then(data => Feed.instagram.utility.getImages(data))
               .catch(function(error) {
                 console.log(error);
               });
@@ -506,11 +502,10 @@ export function socialfeed(_options) {
               "&count=" +
               options.vk.limit +
               "&callback=?";
-            fetch(request_url).then(function(res) {
-              res.json().then(function(data) {
-                Feed.vk.utility.getPosts(data);
-              });
-            });
+
+            fetch(request_url)
+              .then(res => res.json())
+              .then(data => Feed.vk.utility.getPosts(data));
             break;
           case "#":
             var hashtag = account.substr(1);
@@ -521,11 +516,10 @@ export function socialfeed(_options) {
               "&count=" +
               options.vk.limit +
               "&callback=?";
-            fetch(request_url).then(function(res) {
-              res.json().then(function(data) {
-                Feed.vk.utility.getPosts(data);
-              });
-            });
+
+            fetch(request_url)
+              .then(res => res.json())
+              .then(data => Feed.vk.utility.getPosts(data));
             break;
           default:
         }
@@ -543,11 +537,10 @@ export function socialfeed(_options) {
                         -1 * owner_id +
                         "&callback=?",
                   element = this;
-                fetch(vk_wall_owner_url).then(function(res) {
-                  res.text().then(function(data) {
-                    Feed.vk.utility.unifyPostData(data, element, json);
-                  });
-                });
+
+                fetch(vk_wall_owner_url)
+                  .then(res => res.text())
+                  .then(data => Feed.vk.utility.unifyPostData(data, element, json));
               }
             });
           }
@@ -572,29 +565,31 @@ export function socialfeed(_options) {
           if (element.from_id > 0) {
             var vk_user_json =
               Feed.vk.user_json_template + element.from_id + "&callback=?";
-            fetch(vk_user_json).then(function(res) {
-              res.json().then(function(data) {
+
+            fetch(vk_user_json)
+              .then(res => res.json())
+              .then(data => {
                 var post = new SocialFeedPost(
                   "vk",
                   Feed.vk.utility.getUser(data, post, element, json)
                 );
                 container.push(Object.assign({}, post).content);
               });
-            });
           } else {
             var vk_group_json =
               Feed.vk.group_json_template +
               -1 * element.from_id +
               "&callback=?";
-            fetch(vk_group_json).then(function(res) {
-              res.json().then(function(data) {
+
+            fetch(vk_group_json)
+              .then(res => res.json())
+              .then(data => {
                 var post = new SocialFeedPost(
                   "vk",
                   Feed.vk.utility.getGroup(data, post, element, json)
                 );
                 container.push(Object.assign({}, post).content);
               });
-            });
           }
         },
         getUser: function(user_json, post, element, json) {
@@ -627,11 +622,10 @@ export function socialfeed(_options) {
               "http://" +
               username +
               ".blogspot.com/feeds/posts/default?alt=json-in-script&callback=?";
-            fetch(url).then(function(res) {
-              res.json().then(function(data) {
-                getPosts(data);
-              });
-            });
+
+            fetch(url)
+              .then(res => res.json())
+              .then(data => getPosts(data));
             break;
           default:
         }
@@ -694,11 +688,9 @@ export function socialfeed(_options) {
             break;
           default:
         }
-        fetch(request_url).then(function(res) {
-          res.json().then(function(data) {
-            Feed.pinterest.utility.getPosts(data);
-          });
-        });
+        fetch(request_url)
+          .then(res => res.json())
+          .then(data => Feed.pinterest.utility.getPosts(data));
       },
       utility: {
         getPosts: function(json) {
@@ -749,11 +741,9 @@ export function socialfeed(_options) {
           ),
           request_url = Feed.rss.api + yql + "&format=json&callback=?";
 
-        fetch(request_url).then(function(data) {
-          data.json().then(function(data) {
-            Feed.rss.utility.getPosts(data);
-          });
-        });
+        fetch(request_url)
+          .then(data => data.json())
+          .then(data => Feed.rss.utility.getPosts(data));
       },
       utility: {
         getPosts: function(json) {
