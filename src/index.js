@@ -2,6 +2,7 @@ import * as Codebird from "codebird";
 import moment from "moment";
 
 export function socialfeed(_options) {
+
   var defaults = {
     plugin_folder: "", // a folder in which the plugin is located (with a slash in the end)
     template: "template.html", // a path to the template file
@@ -104,15 +105,27 @@ export function socialfeed(_options) {
   var Feed = {
     template: false,
     init: function() {
+    },
+    getTemplate: function() {
       return new Promise(function(resolve, reject) {
-        Feed.getTemplate(function() {
-          social_networks.map(function(network) {
-            Feed.processAll(network, resolve);
-          });
-        });
+        if (Feed.template) resolve();
+        else {
+          if (options.template_html) {
+            Feed.template = options.template_html;
+            resolve();
+          } else {
+            return fetch(options.template)
+              .then(data => data.text())
+              .then(template => {
+                Feed.template = template;
+                resolve();
+              })
+              .catch(error => reject(error))
+          }
+        }
       });
     },
-    processAll: function(network, cb) {
+    processAll: function(network) {
       if (options[network]) {
         if (options[network].accounts) {
           //loaded[network] = 0;
@@ -126,26 +139,6 @@ export function socialfeed(_options) {
           });
         } else {
           Feed[network].getData();
-        }
-      }
-      cb(container);
-    },
-    getTemplate: function(callback) {
-      if (Feed.template) return callback();
-      else {
-        if (options.template_html) {
-          Feed.template = options.template_html;
-          return callback();
-        } else {
-          fetch(options.template)
-            .then(data => data.text())
-            .then(template => {
-              Feed.template = template;
-              return callback();
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
         }
       }
     },
@@ -792,5 +785,8 @@ export function socialfeed(_options) {
     }
   };
 
-  return Feed.init();
+  return Feed.getTemplate()
+    .then(() => Promise.all(social_networks.map(async (network) => Feed.processAll(network))))
+    .then(() => container)
+
 }
