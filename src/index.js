@@ -62,12 +62,11 @@ export function socialfeed(_options) {
     shorten(string) {
       string = string.trim();
       if (string.length > options.length) {
-        return `${jQuery
-          .trim(string)
+        return string
           .substring(0, options.length)
           .split(" ")
           .slice(0, -1)
-          .join(" ")}...`;
+          .join(" ") + '...';
       } else {
         return string;
       }
